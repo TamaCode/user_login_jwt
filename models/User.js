@@ -16,6 +16,17 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+// Mongoose Hooks
+userSchema.post('save', function (doc, next) {
+    console.log('new user was created & saved', doc);
+    next();
+});
+
+userSchema.pre('save',  function (next) {
+    console.log('user is about to created and saved', this);
+    next();
+});
+
 const User = mongoose.model('user', userSchema); // User model
 
 module.exports = User;
