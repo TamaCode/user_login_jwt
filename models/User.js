@@ -25,9 +25,26 @@ userSchema.post('save', function (doc, next) {
 
 userSchema.pre('save',  async function (next) {
     const salt = await bcrypt.genSalt();
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password, salt); // this - user instance
     next();
 });
+
+// Static method to login user
+userSchema.statics.login = async function(email, password) {
+    const user = await this.findOne({ email }); // this - User model
+
+    if (user) {
+        const auth = await bcrypt.compare(password, user.password);
+
+        if (auth) {
+            return user;
+        }
+
+        throw Error('incorrect password');
+    }
+
+    throw Error('incorrect email');
+}
 
 const User = mongoose.model('user', userSchema); // User model
 
